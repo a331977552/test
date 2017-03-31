@@ -1,12 +1,12 @@
 #include "LayerMain.h"
 #include "SimpleAudioEngine.h"
 #include "cocos2d.h"
+#include "EnemySprite.h"
 USING_NS_CC;
 using namespace  CocosDenshion;
 #define winSize  Director::getInstance()->getWinSize() 
 
 Scene * LayerMain::createScene() {
-	
 	Scene * s = Scene::create();
 	s->addChild(LayerMain::create());
 	return s;
@@ -40,7 +40,8 @@ void LayerMain::addHero(){
    setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 }
 void LayerMain::addEnemy(){
-
+	  enemyLayer= EnemyLayer::create();
+	addChild(enemyLayer);
 }
 void LayerMain::addFood(){
 
@@ -53,18 +54,59 @@ void LayerMain::resumeCallBack(Ref *f){
 }
 void LayerMain::update(float dt){
 	Array * bullets=bulletLayer->arrBullets;
-	Array  *temp=Array::create();
-
-
+	Array  *tempbullets=Array::create();
+	Array  *tempEnemy=Array::create();
 	for (int i = 0; i < bullets->count(); i++) {
 	   Sprite * spr=dynamic_cast< Sprite *>	(bullets->getObjectAtIndex(i));	
 	   if (spr->getPosition().y >= winSize.height) {
-		   temp->addObject(spr);
+		   tempbullets->addObject(spr);
 	   }
 	}
+	
 
-	bullets->removeObjectsInArray(temp);
+	bullets->removeObjectsInArray(tempbullets);
+	tempbullets->removeAllObjects();
+
 	//CCLOG("bullets'Count is  %d", bullets->count());
+	Array *enemies=enemyLayer->arrEnemy;
+	//CCLOG("enemies'Count is  %d", enemies->count());
+	for (int i = 0; i < bullets->count(); i++) {
+	   Sprite * bullet=dynamic_cast< Sprite *>	(bullets->getObjectAtIndex(i));	
+	 
+	 for (int j = 0; j < enemies->count(); j++) {
+		  Sprite * enemy=dynamic_cast< Sprite *>	(enemies->getObjectAtIndex(j));	
+		  if (enemy->getBoundingBox().containsPoint(bullet->getPosition())) {
+			  tempbullets->addObject(bullet);
+			  EnemySprite * en =( EnemySprite *) enemy;
+			  en->life--;
+			  if (en->life <= 0) {
+			  tempEnemy->addObject(enemy);
+			  enemyLayer->blowup(enemy);
+			  }
+		  }
+	   }
+	}
+	 for (int j = 0; j < enemies->count(); j++) {
+		  Sprite * enemy=dynamic_cast< Sprite *>	(enemies->getObjectAtIndex(j));	
+		  if (enemy->getBoundingBox().containsPoint(Hero::getInstance()->getPosition())) {
+			  Hero::getInstance()->removeFromParent();		
+			  EnemySprite * en =( EnemySprite *) enemy;
+			  en->life--;
+			  if (en->life <= 0) {
+			  tempEnemy->addObject(enemy);
+			  enemyLayer->blowup(enemy);
+		  }
+	   }
+	}
+	
+	for (int j = 0; j < tempbullets->count(); j++) {
+		Sprite * d=(Sprite *)tempbullets->getObjectAtIndex(j);
+		d->removeFromParent();
+	}
+	enemies->removeObjectsInArray(tempEnemy);
+	bullets->removeObjectsInArray(tempbullets);
+
+
 }
 bool LayerMain::onTouchBegan(Touch *touch, Event *unused_event){
 	Rect rec= Hero::getInstance()->getBoundingBox();

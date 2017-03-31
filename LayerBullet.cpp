@@ -8,7 +8,7 @@ bool LayerBullet::init() {
 	
 	arrBullets = Array::create();
 	arrBullets->retain();
-	schedule(SEL_SCHEDULE(&LayerBullet::addBullet), 0.2);
+	schedule(SEL_SCHEDULE(&LayerBullet::addBullet), 0.3);
 	return true;
 }
 void LayerBullet::addBullet(float de) {
@@ -23,7 +23,7 @@ void LayerBullet::addBullet(float de) {
 	arrBullets->addObject(spr);
 	addChild(spr);
 	float distance=Director::getInstance()->getWinSize().height - v.y;
-	float time=distance/ 300;
+	float time=distance/ 150;
 	MoveTo* move = MoveTo::create(time,Vec2(v.x,Director::getInstance()->getWinSize().height));
 	CCCallFuncN *func = CCCallFuncN::create(spr,SEL_CallFuncN(&LayerBullet::bulletFinishedTravelCallBack));
 	Sequence * se = Sequence::create(move, func, NULL);
