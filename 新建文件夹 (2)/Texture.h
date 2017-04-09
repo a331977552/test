@@ -26,7 +26,7 @@ class Texture {
 		
 	};
 public :
-	Texture(string &filename, const string &name = "");
+	Texture(string filename, const string &name = "");
 	~Texture();
 
 public :

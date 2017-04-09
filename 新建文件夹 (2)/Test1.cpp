@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "GlEngine.h"
 #include "Control.h"
+
 const GLsizei width = 400;
 const GLsizei height = 400;
 float angleX = 45;
@@ -15,8 +16,9 @@ Texture *tex;
 Control  *c=NULL;
 Control::mouseState mouseState;
 Control * controlled=NULL;
+
 void checkKey() {
-	const static float speed = .01f;
+	const static float speed = 1.f;
 	if (keys[GLUT_KEY_F1]) {
 		exit(0);
 	}
@@ -46,10 +48,12 @@ void displayFPS() {
 		  char title[80];
 		  sprintf_s(title, "current fps:%.1f" ,fps);
 		  glutSetWindowTitle(title);
+		//  GlEngine::getInstance()->drawText(title, 0, 0);
 		  lastTime = newTime;
 		  loops = 0;
 	 }
 	 loops++;
+	
 }
 void drawControl() {
 	for (list<Control *>::iterator it = Control::controls.begin(); it != Control::controls.end(); it++) {
@@ -69,22 +73,17 @@ void drawControl() {
 
 
 }
-void draw() {
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glBindTexture(GL_TEXTURE_2D, tex->texId);
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glTranslatef(0, 0, -5.0f);
-	glRotatef(angleX, 1, 0, 0);
-	glRotatef(angleY, 0, 1, 0);
+GLuint  gridList;
+void establishMatrixProjection();
+void setOrtho();
+void drawCube() {
 	glBegin(GL_QUADS);
-	
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.f, 1.f, -1.f);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.f, 1.f, -1.f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.f, 1.f, 1.f);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.f, 1.f, 1.f);
-	
+
+
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.f, -1.f, 1.f);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.f, -1.f, 1.f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.f, -1.f, -1.f);
@@ -113,31 +112,73 @@ void draw() {
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(1.f, -1.f, 1.f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.f, -1.f, -1.f);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.f, 1.f, -1.f);
-
 	glEnd();
+}
+void draw() {
+	
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	establishMatrixProjection();
+	glDisable(GL_BLEND);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glTranslatef(0, 0, -20.0f);
+	glRotatef(angleX, 1, 0, 0);
+	glRotatef(angleY, 0, 1, 0);
+	glBindTexture(GL_TEXTURE_2D,tex->texId);
+	if (gridList == 0) {
+		gridList=	 glGenLists(1);
+		glNewList(1, GL_COMPILE_AND_EXECUTE);
+		drawCube();
+		glEndList();
+	}
+	else {
+		for (int i = 0; i < 10; i++) {
+
+			for (int j = 0; j < 10; j++) {
+				glPushMatrix();
+				glTranslatef( i*2.5f, j*2.5f, 0);
+				glCallList(1);
+				//glLoadIdentity();	
+				glPopMatrix();
+			}
+		}
+		
+	}
+	
 	glFlush();
 	glutSwapBuffers();
 	checkKey();
-	glMatrixMode(GL_MODELVIEW);
-	gluOrtho2D(0,width,0,height);
+	
+	setOrtho();
 	displayFPS();
-	glLoadIdentity();
+	setOrtho();
 	drawControl();
 }
+void setOrtho() {
+	//glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, width, height, 0);
 
+}
+void establishMatrixProjection() {
+	//glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45, width / height, 1, 200);
+}
 void initGL() {
-	string  str("f:\\font.tga");
-	tex = new Texture(str,"surface test");
-	glViewport(0, 0, width, height);
+
+	establishMatrixProjection();
 	glClearColor(0.0f, 0.0f, 0.0f,1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glShadeModel(GL_SMOOTH);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45, width / height, 1, 200);
 	glEnable(GL_TEXTURE_2D);
+	string  str("h:/surface.tga");
+	tex = new Texture(str,"surface test");
+	
 	GlEngine::getInstance()->initialize();
+	GlEngine::getInstance()->buildTexTureFont();
 }
 void timer(int value) {
 	
@@ -168,9 +209,8 @@ void mouseStateFunc(int button,int state,int x,int y) {
 	mouseState.x = x;
 	mouseState.y = y;
 }
-
 int main(int args, char **argv) {
-
+	
 	glutInit(&args, argv);
 	glutInitDisplayMode(GLUT_DOUBLE);
 	glutCreateWindow("test1");
