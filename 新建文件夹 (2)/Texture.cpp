@@ -1,10 +1,11 @@
 #include "Texture.h"
  vector<Texture *> Texture::vec;
-Texture::Texture(string in_filename, const string &name){
-	   vec.push_back(this);
+Texture::Texture(string &in_filename, const string &name){
+	  vec.push_back(this);
 		this->name = name;
-		loadTga(in_filename);
+		loadTga(in_filename.data());
 }
+
 Texture::~Texture(){
 		vector<Texture *>::iterator or=vec.begin();
 		while(or!=vec.end()) {
@@ -17,70 +18,8 @@ Texture::~Texture(){
 		if (!imageData)
 			delete []imageData;
 	}
-bool Texture::loadTga(string filename) {
+bool Texture::loadTga(const char * filename) {
 
-	////将全局区域设为操作系统默认区域
-	//ifstream file(filename,std::ios::binary);
-	//
-	//if (!file.is_open())
-	//{
-	//std::cout << " fail to open  file"<<std::endl;
-
-	//return false;
-	//}
-	//
-	//
-	//TgaHeader header;
- // 
-	//if (!file.read((char *)&header, sizeof(header))) {
-	//	std::cout << " fail to read  header data"<<std::endl;
-	//	return false;
-	//}
-	//
-	//if (header.ImageType != 2) {
-	//	std::cout << "imageType is unsupportable"<<std::endl;
-	//	return false;
-	//}
-	//if (header.pixelDepth != 24 && header.pixelDepth != 32)
-	//{
-
-	//	std::cout << "pixelDepth is unsupportable"<<std::endl;
-	//	return false;
-	//}
-	//	
-	//if (header.width == 0 || header.heigh == 0) {
-	//std::cout << "width or height is unsupportable"<<std::endl;
-	//	return false;
-	//}
-	// imageType = GL_RGB;
-	//if (header.pixelDepth == 32) {
-	//	imageType = GL_RGBA;
-	//}
-	//width = header.width;
-	//height = header.heigh;
-	//this->filename =new string(filename);
-	//GLubyte bitsPerPixel = header.pixelDepth / 8;
-	//int imageSize = width*height*bitsPerPixel;
-	//   
-	//imageData = new GLubyte[imageSize];
-
-	//if (imageData == NULL) {
-	//		std::cout << "unable to allocate imageData"<<std::endl;
-	//	return false;
-	//}
-
-	//
-	//if (!file.read((char*)imageData, sizeof(imageData))) {
-	//	delete[] imageData;
-	//	std::cout << "unable to read imageData from file"<<std::endl;
-	//	return false;
-	//}
-	////swap RGB to BGR
-	//for (int i = 0; i < (int)imageSize; i +=bitsPerPixel) {     
-	//	GLuint temp = imageData[i];
-	//	imageData[i] = imageData[i + 2];
-	//	imageData[i + 2] = temp; 
-	//}
 	GLubyte     TGAheader[12] = { 0,0,2,0,0,0,0,0,0,0,0,0 };    // Uncompressed TGA Header  
 	GLubyte     TGAcompare[12];                             // Used To Compare TGA Header  
 	GLubyte     header[6];                                  // First 6 Useful Bytes From The Header  
@@ -89,7 +28,7 @@ bool Texture::loadTga(string filename) {
 	GLuint      temp;                                       // Temporary Variable  
 	                             // Set The Default GL Mode To RBGA (32 BPP)  
 	FILE *file;
-	const char * str=filename.data();
+	const char * str=filename;
 	fopen_s(&file,str, "rb");                     // Open The TGA File  
 	if (file == NULL ||                                       // Does File Even Exist?  
 		fread(TGAcompare, 1, sizeof(TGAcompare), file) != sizeof(TGAcompare) ||  // Are There 12 Bytes To Read?  

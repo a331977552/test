@@ -1,16 +1,11 @@
 #pragma once
 #include <gl/glut.h>
 #include "iostream"
-#include "stdio.h"
+#include <stdio.h>
 #include "vector"
+#include <stdlib.h>
 #include <string>
-#include <ostream>
-#include <fstream>
-
 using std::string;
-using std::fstream;
-using std::ifstream;
-using std::ostream;
 using std::vector;
 class Texture {
 	struct TgaHeader {
@@ -23,10 +18,11 @@ class Texture {
 		GLushort  width;
 		GLushort  heigh;
 		GLubyte   pixelDepth;
-		
+		GLubyte   info;
 	};
 public :
-	Texture(string filename, const string &name = "");
+	Texture(string &filename, const string &name = "");
+
 	~Texture();
 
 public :
@@ -41,7 +37,7 @@ public :
 	static vector<Texture *> vec;
 private :
 	
-	bool loadTga(string filename);
+	bool loadTga(const char * name);
 		
 
 	bool createTexture();

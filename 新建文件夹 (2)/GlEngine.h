@@ -9,7 +9,7 @@ class GlEngine
 {
 public:
 	GLubyte  fontSize =13;
-	GLubyte  fontspace = 17;
+	GLubyte  fontspace = 14;
 	GLuint fontlist;
 	Texture * fontTexture;
 	GlEngine();

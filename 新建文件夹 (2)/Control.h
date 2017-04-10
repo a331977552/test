@@ -29,8 +29,9 @@ public:
 	static list<Control *> controls;
 	int x;
 	int y;
-	bool  updateControl(mouseState &state);
+	
 	Control(int positionX,int positionY,int width,int height);
+	virtual bool  updateControl(mouseState &state);
 	virtual void  drawControl() =0;
     virtual ~Control();
 	virtual string getType()=0;

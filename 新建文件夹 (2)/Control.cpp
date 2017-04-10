@@ -5,8 +5,8 @@
  list<Control *> Control::controls;
 	
  bool  Control::updateControl(mouseState &state) {
-	 int x = state.x;
-	 int y = state.y;
+	  x = state.x;
+	  y = state.y;
 	 inside = false;
 	 if (x >= posX &&x < (posX + width) &&
 		 y >= posY &&y < (posY + height)) {
@@ -38,8 +38,8 @@
 		return width;
  }
 Control * Control::addControl(Control* control) {
-		static int lastX = 5;
-		static int lastY = 5;
+		 int lastX = 20;
+		static int lastY = 20;
 		control->setPosition(lastX,lastY);
 		lastY+=control->getHeight();
 		lastX+=control->getWidth();
