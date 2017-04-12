@@ -9,6 +9,7 @@
 #include "Button.h"
 #include "ListBox.h"
 #include "Slider.h"
+#include "Node.h"
 const GLsizei width = 500;
 const GLsizei height = 500;
 bool navigating=false;
